@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hem</title>
+    <link rel="stylesheet" href="css/main.scss" />
+    <script src="js/main.js" type="module"></script>
+  </head>
+  <body>
+    <header>
+      <p>DT207G-Labb 4</p>
+    </header>
+    <main>
+      <div class="container">
+        <div class="info">
+          <!-- <p>
+            Detta är en sida utan särskilt innehåll. Poängen är att du ska kunna
+            registrera dig samt logga in och få tillgång till innehållet på
+            "Mina sidor".
+          </p> -->
+        </div>
+        <div class="form-container">
+          <section class="register-section">
+            <h2>Registrera dig</h2>
+            <form method="post" class="register-form">
+              <label for="firstname">Förnamn:</label>
+              <br />
+              <input type="text" id="firstname" name="firstname" />
+              <br />
+              <label for="lastname">Efternamn:</label>
+              <br />
+              <input type="text" id="lastname" name="lastname" />
+              <br />
+              <label for="username">Användarnamn:</label>
+              <br />
+              <input type="text" id="username" name="username" />
+              <br />
+              <label for="password">Lösenord:</label>
+              <br />
+              <input type="password" id="password" name="password" />
+              <br />
+              <input type="submit" id="register" value="Registrera" />
+            </form>
+          </section>
+          <div id="errMessageReg"></div>
+          <section class="login-section">
+            <h2>Logga in</h2>
+            <form action="post" class="login-form">
+              <label for="userName">Användarnamn:</label>
+              <br />
+              <input type="text" id="userNameLogin" name="userName" />
+              <br />
+              <label for="passWord">Lösenord:</label>
+              <br />
+              <input type="passWord" id="passWordLogin" name="passWord" />
+              <br />
+              <input type="submit" id="login" value="Logga in" />
+            </form>
+          </section>
+          <div id="errMessageLog"></div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <p>&copy;Andreas Nygård, 2024</p>
+      <p>
+        <a href="mailto:anny2301@student.miun.se">anny2301@student.miun.se</a>
+      </p>
+    </footer>
+  </body>
+</html>
