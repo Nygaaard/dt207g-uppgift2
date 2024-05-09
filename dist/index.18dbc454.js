@@ -586,7 +586,8 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"1SICI":[function(require,module,exports) {
 var _register = require("./register");
 var _login = require("./login");
-console.log("test");
+var _myPages = require("./my-pages");
+//Variables
 const registerEl = document.getElementById("register");
 const firstnameEl = document.getElementById("firstname");
 const lastnameEl = document.getElementById("lastname");
@@ -596,33 +597,53 @@ const loginEl = document.getElementById("login");
 const userNameLoginEl = document.getElementById("userNameLogin");
 const passWordLoginEl = document.getElementById("passWordLogin");
 const errMessageRegEl = document.getElementById("errMessageReg");
-registerEl.addEventListener("click", function() {
-    event.preventDefault();
-    const firstnameValue = firstnameEl.value;
-    const lastnameValue = lastnameEl.value;
-    const usernameValue = usernameEl.value;
-    const passwordValue = passwordEl.value;
-    if (firstnameValue === "" || lastnameValue === "" || usernameValue === "" || passwordValue === "") errMessageRegEl.textContent = "Alla f\xe4lt m\xe5ste fyllas i.";
-    (0, _register.registerUser)(firstnameValue, lastnameValue, usernameValue, passwordValue);
-});
-loginEl.addEventListener("click", async function() {
-    event.preventDefault();
-    const userNameLoginValue = userNameLoginEl.value;
-    const passWordLoginValue = passWordLoginEl.value;
-    const authorized = await (0, _login.loginUser)(userNameLoginValue, passWordLoginValue);
-});
+if (window.location.pathname === "/") {
+    registerEl.addEventListener("click", function() {
+        event.preventDefault();
+        const firstnameValue = firstnameEl.value;
+        const lastnameValue = lastnameEl.value;
+        const usernameValue = usernameEl.value;
+        const passwordValue = passwordEl.value;
+        //Unvalid input
+        if (firstnameValue === "" || lastnameValue === "" || usernameValue === "" || passwordValue === "") errMessageRegEl.textContent = "Alla f\xe4lt m\xe5ste fyllas i.";
+        //If input is valid
+        (0, _register.registerUser)(firstnameValue, lastnameValue, usernameValue, passwordValue);
+    });
+    loginEl.addEventListener("click", async function() {
+        event.preventDefault();
+        const userNameLoginValue = userNameLoginEl.value;
+        const passWordLoginValue = passWordLoginEl.value;
+        const authorized = await (0, _login.loginUser)(userNameLoginValue, passWordLoginValue);
+        //Authorization control
+        if (authorized) try {
+            const token = localStorage.getItem("token");
+            const userInfo = await (0, _myPages.getUserInfo)(token);
+            (0, _myPages.displayUserInfo)(userInfo);
+        } catch (error) {
+            console.error("Could not find user information...");
+        }
+    });
+}
 
-},{"./register":"4C53m","./login":"47T64"}],"4C53m":[function(require,module,exports) {
-// Funktion för att registrera en ny användare
+},{"./register":"4C53m","./login":"47T64","./my-pages":"3jytk"}],"4C53m":[function(require,module,exports) {
+// Register new user
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "registerUser", ()=>registerUser);
 async function registerUser(firstname, lastname, username, password) {
     try {
-        // Validera inmatning
+        // Validate input
         if (!firstname || !lastname || !username || !password) throw new Error("Alla f\xe4lt m\xe5ste fyllas i.");
-        if (username.length < 5) throw new Error("Anv\xe4ndarnamnet m\xe5ste vara minst 5 tecken l\xe5ngt.");
-        if (password.length < 8) throw new Error("L\xf6senordet m\xe5ste vara minst 8 tecken l\xe5ngt.");
+        if (username.length < 5) {
+            const errMessageRegEl = document.getElementById("errMessageReg");
+            errMessageRegEl.textContent = "Anv\xe4ndarnamn m\xe5ste vara minst 5 tecken l\xe5ngt.";
+            throw new Error("Username must be at least 5 characters long.");
+        }
+        if (password.length < 8) {
+            const errMessageRegEl = document.getElementById("errMessageReg");
+            errMessageRegEl.textContent = "L\xf6senordet m\xe5ste vara minst 8 tecken l\xe5ngt.";
+            throw new Error("Password must be at least 8 characters long.");
+        }
         const url = "http://localhost:3000/api/register";
         const response = await fetch(url, {
             method: "POST",
@@ -636,9 +657,9 @@ async function registerUser(firstname, lastname, username, password) {
                 password
             })
         });
-        // Kontrollera om registreringen lyckades
-        if (!response.ok) throw new Error("Kunde inte registrera ny anv\xe4ndare.");
-        // Returnera resultatet
+        // If register succeeded
+        if (!response.ok) throw new Error("Failed to register new user.");
+        // Return result
         const data = await response.json();
         alert("Du \xe4r nu registrerad!");
         const firstnameEl = document.getElementById("firstname");
@@ -651,7 +672,7 @@ async function registerUser(firstname, lastname, username, password) {
         passwordEl.value = "";
         return data;
     } catch (error) {
-        console.error("Fel vid registrering av ny anv\xe4ndare:", error.message);
+        console.error("Error register new user:", error.message);
         throw error;
     }
 }
@@ -693,8 +714,13 @@ parcelHelpers.export(exports, "loginUser", ()=>loginUser);
 parcelHelpers.export(exports, "validateUser", ()=>validateUser);
 async function loginUser(username, password) {
     try {
-        // Validate input
-        if (!username || !password) throw new Error("Alla f\xe4lt m\xe5ste fyllas i.");
+        // If input is missing
+        if (!username || !password) {
+            const errMessageLogEl = document.getElementById("errMessageLog");
+            if (!username) errMessageLogEl.textContent = "Fyll i anv\xe4ndarnamnet";
+            else errMessageLogEl.textContent = "Fyll i l\xf6senordet";
+            throw new Error("Alla f\xe4lt m\xe5ste fyllas i.");
+        }
         const url = "http://localhost:3000/api/login";
         const response = await fetch(url, {
             method: "POST",
@@ -706,8 +732,12 @@ async function loginUser(username, password) {
                 password
             })
         });
-        // If register succeeds
-        if (!response.ok) throw new Error("Kunde inte logga in anv\xe4ndare.");
+        // If wrong username/password
+        if (!response.ok) {
+            const errMessageLogEl = document.getElementById("errMessageLog");
+            errMessageLogEl.textContent = "Fel anv\xe4ndarnamn eller l\xf6senord";
+            throw new Error("Kunde inte logga in anv\xe4ndare.");
+        }
         // Return result
         const data = await response.json();
         const token = data.response.token;
@@ -715,7 +745,7 @@ async function loginUser(username, password) {
         //Validate authorization
         if (validate.message === "Protected route") {
             alert("Du \xe4r inloggad!");
-            window.location.href = "my-pages.html";
+            window.location.href = `my-pages?username=${username}`;
         }
     } catch (error) {
         console.error("Fel vid inloggning:", error.message);
@@ -736,9 +766,59 @@ async function validateUser(token) {
         return response;
     }).catch((error)=>{
         console.error("Fel vid inloggning:", error.message);
-    // Här kan du lägga till kod för att hantera felaktig inloggning
     });
     return response.json();
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3jytk":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+//Get user information
+parcelHelpers.export(exports, "getUserInfo", ()=>getUserInfo);
+//Display user information
+parcelHelpers.export(exports, "displayUserInfo", ()=>displayUserInfo);
+const params = new URLSearchParams(window.location.search);
+const user = params.get("username");
+if (window.location.pathname.includes("/my-pages")) document.addEventListener("DOMContentLoaded", async function() {
+    const token = localStorage.getItem("token");
+    //If not authorized - send back to start page
+    if (!token) {
+        window.location.href = "index.html";
+        return;
+    }
+    try {
+        const userInfo = await getUserInfo(token);
+        displayUserInfo(userInfo.find((e)=>e.username === user));
+    } catch (error) {
+        console.error("Could not find user information:", error.message);
+    }
+});
+async function getUserInfo(token) {
+    const url = "http://localhost:3000/api/users";
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    });
+    if (!response.ok) throw new Error("Could not find user information.");
+    return response.json();
+}
+function displayUserInfo(userInfo) {
+    const personalInfoEl = document.getElementById("personal-info");
+    if (!personalInfoEl) {
+        console.error("Could not find personal info.");
+        return;
+    }
+    //Display personal information in DOM
+    personalInfoEl.innerHTML = `
+        <h2>Din information:</h2>
+        <p><b>F\xf6rnamn:</b> ${userInfo.firstname}</p>
+        <p><b>Efternamn:</b> ${userInfo.lastname}</p>
+        <p><b>Anv\xe4ndarnamn:</b> ${userInfo.username}</p>
+        <br>
+        <p class="created">Ditt konto skapades ${userInfo.created}</p>
+      `;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["j2YDk","1SICI"], "1SICI", "parcelRequire2a77")

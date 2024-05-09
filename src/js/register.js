@@ -1,17 +1,23 @@
-// Funktion för att registrera en ny användare
+// Register new user
 export async function registerUser(firstname, lastname, username, password) {
   try {
-    // Validera inmatning
+    // Validate input
     if (!firstname || !lastname || !username || !password) {
       throw new Error("Alla fält måste fyllas i.");
     }
 
     if (username.length < 5) {
-      throw new Error("Användarnamnet måste vara minst 5 tecken långt.");
+      const errMessageRegEl = document.getElementById("errMessageReg");
+      errMessageRegEl.textContent =
+        "Användarnamn måste vara minst 5 tecken långt.";
+      throw new Error("Username must be at least 5 characters long.");
     }
 
     if (password.length < 8) {
-      throw new Error("Lösenordet måste vara minst 8 tecken långt.");
+      const errMessageRegEl = document.getElementById("errMessageReg");
+      errMessageRegEl.textContent =
+        "Lösenordet måste vara minst 8 tecken långt.";
+      throw new Error("Password must be at least 8 characters long.");
     }
 
     const url = "http://localhost:3000/api/register";
@@ -29,12 +35,12 @@ export async function registerUser(firstname, lastname, username, password) {
       }),
     });
 
-    // Kontrollera om registreringen lyckades
+    // If register succeeded
     if (!response.ok) {
-      throw new Error("Kunde inte registrera ny användare.");
+      throw new Error("Failed to register new user.");
     }
 
-    // Returnera resultatet
+    // Return result
     const data = await response.json();
     alert("Du är nu registrerad!");
     const firstnameEl = document.getElementById("firstname");
@@ -49,7 +55,7 @@ export async function registerUser(firstname, lastname, username, password) {
 
     return data;
   } catch (error) {
-    console.error("Fel vid registrering av ny användare:", error.message);
+    console.error("Error register new user:", error.message);
     throw error;
   }
 }

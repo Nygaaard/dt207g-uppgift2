@@ -4,3 +4,9 @@ footer {
   align-items: center;
   min-height: 70px;
 }
+
+@media all and (max-width: 700px) {
+  footer {
+    flex-direction: column;
+  }
+}

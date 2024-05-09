@@ -2,6 +2,7 @@ header {
   color: #fff;
   text-align: center;
   background-color: #333;
+  margin-bottom: 1.2rem;
   padding: 2rem;
 }
 
@@ -90,6 +91,12 @@ footer {
   display: flex;
 }
 
+@media (width <= 700px) {
+  footer {
+    flex-direction: column;
+  }
+}
+
 .info {
   width: 60%;
   margin: 0 auto;
@@ -98,5 +105,39 @@ footer {
 
 h2 {
   margin-bottom: 20px;
+}
+
+.my-pages-info {
+  width: 60%;
+  margin: 0 auto;
+  padding: .8rem;
+}
+
+#personal-info {
+  width: 80%;
+  margin: 0 auto;
+  padding: .8rem;
+}
+
+.image {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+img {
+  width: 150px;
+  height: 300px;
+}
+
+.created {
+  color: #181818;
+  font-size: .9rem;
+}
+
+@media (width <= 700px) {
+  .my-pages-info {
+    width: 90%;
+  }
 }
 /*# sourceMappingURL=index.8c1c22dc.css.map */

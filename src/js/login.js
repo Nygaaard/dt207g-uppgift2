@@ -1,7 +1,13 @@
 export async function loginUser(username, password) {
   try {
-    // Validate input
+    // If input is missing
     if (!username || !password) {
+      const errMessageLogEl = document.getElementById("errMessageLog");
+      if (!username) {
+        errMessageLogEl.textContent = "Fyll i användarnamnet";
+      } else {
+        errMessageLogEl.textContent = "Fyll i lösenordet";
+      }
       throw new Error("Alla fält måste fyllas i.");
     }
 
@@ -18,20 +24,24 @@ export async function loginUser(username, password) {
       }),
     });
 
-    // If register succeeds
+    // If wrong username/password
     if (!response.ok) {
+      const errMessageLogEl = document.getElementById("errMessageLog");
+      errMessageLogEl.textContent = "Fel användarnamn eller lösenord";
       throw new Error("Kunde inte logga in användare.");
     }
 
     // Return result
     const data = await response.json();
     const token = data.response.token;
+
     const validate = await validateUser(token);
 
     //Validate authorization
     if (validate.message === "Protected route") {
       alert("Du är inloggad!");
-      window.location.href = "my-pages.html";
+
+      window.location.href = `my-pages?username=${username}`;
     }
   } catch (error) {
     console.error("Fel vid inloggning:", error.message);
@@ -58,7 +68,6 @@ export async function validateUser(token) {
     })
     .catch((error) => {
       console.error("Fel vid inloggning:", error.message);
-      // Här kan du lägga till kod för att hantera felaktig inloggning
     });
   return response.json();
 }
